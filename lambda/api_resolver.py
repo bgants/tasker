@@ -15,4 +15,5 @@ def get_transactions():
 
 @logger.inject_lambda_context(correlation_id_path=correlation_paths.API_GATEWAY_REST)
 def handler(event: dict, context: LambdaContext) -> dict:
+    logger.info(f" Event: {event}")
     return app.resolve(event, context)
