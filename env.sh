@@ -2,5 +2,5 @@
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 export AWS_PRIMARY_REGION=us-east-1
 export AWS_SECONDARY_REGION=us-west-2
-export AWS_DOMAIN_NAME=dungeondivinelabs.com # update with your cloudfront URL (after deploying front end) or your custom AWS hosted domain
+export AWS_DOMAIN_NAME=
 export JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=1
