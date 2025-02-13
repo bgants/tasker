@@ -56,22 +56,28 @@ class CrudApiLambdaStack(Stack):
             proxy=False
         )
 
-        transactions = api.root.add_resource("transactions")
-        transactions.add_method("GET")
-        
+        items = api.root.add_resource("items")
+        items.add_method("GET") # GET /items
+        items.add_method("POST") # POST /items
+
+        id = items.add_resource("{id}")
+        id.add_method("GET") # GET /items/{id}
+        id.add_method("PUT") # PUT /items/{id}
+        id.add_method("DELETE") # DELETE /items/{id}
+
         api_domain = apigateway.DomainName(
             self, "CustomApiDomain",
             domain_name=domain_name,
             certificate=certificate,
             endpoint_type=apigateway.EndpointType.REGIONAL
         )
-        
+
         # Add base path mapping to the API
-        apigateway.BasePathMapping(self, "ApiMapping", 
+        apigateway.BasePathMapping(self, "ApiMapping",
             domain_name=api_domain,
             rest_api=api
         )
-        
+
         # Add ARecord to the Hosted Zone
         route53.ARecord(
             self, "ApiAliasRecord",
