@@ -6,6 +6,9 @@ from aws_cdk import (
     aws_route53 as route53,
     aws_certificatemanager as acm,
     aws_route53_targets as targets,
+    aws_iam as iam,
+    aws_dynamodb as _dynamodb,
+    RemovalPolicy
 )
 
 from cdk_aws_lambda_powertools_layer import LambdaPowertoolsLayer
@@ -21,7 +24,7 @@ class TaskerApiStack(Stack):
         # Create a Hosted Zone
         hosted_zone = route53.HostedZone.from_lookup(
             self, "HostedZone", domain_name=domain_name)
-        
+
         # Creat a Certificate
         # This means that ACM will create DNS records in the specified
         # hosted zone to prove ownership of the domain
@@ -56,14 +59,17 @@ class TaskerApiStack(Stack):
             proxy=False
         )
 
-        tasks = api.root.add_resource("tasks")
-        tasks.add_method("GET") # GET /tasks
-        tasks.add_method("POST") # POST /tasks
+        task = api.root.add_resource("task")
+        task.add_method("GET") # GET /task
+        task.add_method("POST") # POST /task
 
-        id = tasks.add_resource("{id}")
+        id = task.add_resource("{id}")
         id.add_method("GET") # GET /task/{id}
         id.add_method("PUT") # PUT /task/{id}
         id.add_method("DELETE") # DELETE /task/{id}
+
+        tasks = api.root.add_resource("tasks")
+        tasks.add_method("GET") # GET /tasks
 
         api_domain = apigateway.DomainName(
             self, "TaskerApiDomain",
@@ -86,6 +92,28 @@ class TaskerApiStack(Stack):
                 targets.ApiGatewayDomain(api_domain)
             )
         )
+
+        # Add DynamoDB instance
+        dynamodb_table = _dynamodb.Table(
+            self, "TaskerApiTable",
+            table_name="tasker-api-table",
+            partition_key=_dynamodb.Attribute(
+                name="id",
+                type=_dynamodb.AttributeType.NUMBER
+            ),
+            billing_mode=_dynamodb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=RemovalPolicy.DESTROY,
+        )
+
+        Lambda_function.add_environment("DYNAMODB_TABLE", dynamodb_table.table_name)
+
+        # Attach the role to the Lambda function
+        Lambda_function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:UpdateItem", "dynamodb:Scan"],
+                resources=[dynamodb_table.table_arn]
+            )
+       )
 
         # Output the API Gateway URL
         CfnOutput(self, "APIGatewayURL",

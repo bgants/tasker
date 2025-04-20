@@ -2,8 +2,27 @@
 
 set -e
 
-curl -X POST https://dungeondivinelabs.com/items -H "Content-Type: application/json" -d '{"item_id": 15, "item": "item15" }'
-curl -X PUT https://dungeondivinelabs.com/items/22
-curl -X DELETE https://dungeondivinelabs.com/items/22
-curl -X GET https://dungeondivinelabs.com/items/22
-curl -X GET https://dungeondivinelabs.com/items
+echo "POST test ..."
+curl -X POST https://dungeondivinelabs.com/task -H "Content-Type: application/json" -d '{"id": 15, "task": "Do something" }'
+sleep 3
+echo "\n"
+echo "PUT test ..."
+
+curl -X PUT https://dungeondivinelabs.com/task/22
+sleep 3
+echo "\n"
+echo "GET test ..."
+
+curl -X GET https://dungeondivinelabs.com/task/22
+sleep 3
+echo "\n"
+echo "GET test ..."
+
+curl -X GET https://dungeondivinelabs.com/tasks
+sleep 3
+echo "\n"
+echo "DELETE test ..."
+
+curl -X DELETE https://dungeondivinelabs.com/task/22
+sleep 3
+echo "\n"
