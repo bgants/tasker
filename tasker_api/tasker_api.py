@@ -13,7 +13,7 @@ from cdk_aws_lambda_powertools_layer import LambdaPowertoolsLayer
 from constructs import Construct
 
 
-class CrudApiLambdaStack(Stack):
+class TaskerApiStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, domain_name: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -35,38 +35,38 @@ class CrudApiLambdaStack(Stack):
 
         # Define the Lambda function with the API Gateway Resolver
         Lambda_function = _lambda.Function(
-            self, "CrudApiLambda",
+            self, "TaskerApiLambda",
             runtime=_lambda.Runtime.PYTHON_3_10,
             handler="api_resolver.handler",
             code=_lambda.Code.from_asset("lambda"),
             layers=[power_tools_layer],
             environment={
-            "DOMAIN_NAME": domain_name,
-            "POWERTOOLS_SERVICE_NAME": "CRUD_API",
-            "POWER_TOOLS_LOG_LEVEL": "INFO",
+                "DOMAIN_NAME": domain_name,
+                "POWERTOOLS_SERVICE_NAME": "TASKER_API",
+                "POWER_TOOLS_LOG_LEVEL": "INFO",
             },
         )
 
         # Create an API Gateway
         api = apigateway.LambdaRestApi(
-            self, "CrudApi",
-            rest_api_name="CrudApi",
-            description="This API handles CRUD operations",
+            self, "TaskerApi",
+            rest_api_name="TaskerApi",
+            description="This API handles Tasking operations",
             handler=Lambda_function,
             proxy=False
         )
 
-        items = api.root.add_resource("items")
-        items.add_method("GET") # GET /items
-        items.add_method("POST") # POST /items
+        tasks = api.root.add_resource("tasks")
+        tasks.add_method("GET") # GET /tasks
+        tasks.add_method("POST") # POST /tasks
 
-        id = items.add_resource("{id}")
-        id.add_method("GET") # GET /items/{id}
-        id.add_method("PUT") # PUT /items/{id}
-        id.add_method("DELETE") # DELETE /items/{id}
+        id = tasks.add_resource("{id}")
+        id.add_method("GET") # GET /task/{id}
+        id.add_method("PUT") # PUT /task/{id}
+        id.add_method("DELETE") # DELETE /task/{id}
 
         api_domain = apigateway.DomainName(
-            self, "CustomApiDomain",
+            self, "TaskerApiDomain",
             domain_name=domain_name,
             certificate=certificate,
             endpoint_type=apigateway.EndpointType.REGIONAL

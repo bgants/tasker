@@ -6,48 +6,48 @@ from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 logger = Logger()
 app = APIGatewayRestResolver()
 
-@app.get("/items")
-def get_items():
+@app.get("/tasks")
+def get_tasks() -> dict:
     return {
         "statusCode": 200,
-        "body": "Get all items!"
+        "body": "Get all tasks!"
     }
 
 
-@app.get("/items/<id>")
-def get_item(id: int):
-    logger.info(f"Get item ID: {id}")
+@app.get("/task/<id>")
+def get_task(id: int) -> dict:
+    logger.info(f"Get task ID: {id}")
     return {
         "statusCode": 200,
         "body": "Get item!"
     }
 
 
-@app.post("/items")
-def create_item():
-    item: dict = app.current_event.json_body
-    logger.info(f"Create item: {item}")
+@app.post("/task")
+def create_task() -> dict:
+    task: dict = app.current_event.json_body
+    logger.info(f"Create task: {task}")
     return {
         "statusCode": 200,
         "body": "Create item!"
     }
 
-@app.put("/items/<id>")
-def update_item(id: int):
+@app.put("/task/<id>")
+def update_tasks(id: int) -> dict:
     item: dict = app.current_event.json_body
-    logger.info(f"Update item: {item} with ID: {id}")
+    logger.info(f"Update task: {item} with ID: {id}")
     return {
         "statusCode": 200,
-        "body": "Update item!"
+        "body": "Update task!"
     }
 
 
-@app.delete("/items/<id>")
-def delete_item(id: int):
-    logger.info(f"Delete item ID: {id}")
+@app.delete("/task/<id>")
+def delete_tasks(id: int) -> dict:
+    logger.info(f"Delete task ID: {id}")
     return {
         "statusCode": 200,
-        "body": "Delete item!"
+        "body": "Delete task!"
     }
 
 
